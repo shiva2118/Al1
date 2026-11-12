@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Video Generator</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #1e1e1e; padding: 30px; border-radius: 8px; width: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: 1px solid #444; background: #2d2d2d; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #45a049; }
+        #result { margin-top: 15px; font-weight: bold; word-break: break-all; }
+        .download-btn { display: inline-block; margin-top: 10px; padding: 10px; background: #008CBA; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; width: 100%; box-sizing: border-box;}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>AI Video Generator</h2>
+        <input type="text" id="promptInput" placeholder="Enter your prompt here..." />
+        <button onclick="generateVideo()">Generate Video</button>
+        <p id="result"></p>
+        <div id="downloadContainer"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'https://enjoying-playing-amused.ngrok-free.dev'; // Replace with your active ngrok URL
+
+        async function generateVideo() {
+            const prompt = document.getElementById('promptInput').value;
+            const resultElem = document.getElementById('result');
+            const downloadContainer = document.getElementById('downloadContainer');
+            
+            resultElem.innerText = "Generating video on T4 GPU...";
+            resultElem.style.color = "#ccc";
+            downloadContainer.innerHTML = "";
+
+            try {
+                const response = await fetch(BACKEND_URL + '/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                const data = await response.json();
+                
+                resultElem.innerText = "Success!";
+                resultElem.style.color = "#4CAF50";
+
+                // Create download link for the user
+                const downloadUrl = BACKEND_URL + data.download_url;
+                downloadContainer.innerHTML = `<a href="${downloadUrl}" class="download-btn" target="_blank">Download Generated Video (.mp4)</a>`;
+            } catch (error) {
+                resultElem.innerText = "Error: " + error;
+                resultElem.style.color = "#ff5252";
+            }
+        }
+    </script>
+</body>
+</html>
